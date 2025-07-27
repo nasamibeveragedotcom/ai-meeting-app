@@ -1,4 +1,2 @@
-# Ứng dụng phòng họp
-
-Tạo mới và cài đặt nhiệm vụ của các nhân vật
-đang cập nhật
+# AI Marketing Meeting Room
+Welcome! This application simulates a marketing team meeting using AI-powered personas. You act as the facilitator, setting the stage and guiding the discussion.
