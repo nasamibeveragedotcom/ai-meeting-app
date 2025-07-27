@@ -1,0 +1,6 @@
+{
+  "name": "AI Marketing Meeting Room",
+  "description": "An application to simulate a marketing meeting with AI-powered personas. Users can define AI characters, set a meeting topic, and watch as the AI team discusses the subject. API keys are managed via environment variables for security.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
