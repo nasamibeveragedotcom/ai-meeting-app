@@ -5,6 +5,7 @@ import SettingsPanel from './components/SettingsPanel';
 import MeetingRoom from './components/MeetingRoom';
 import PersonaForm from './components/PersonaForm';
 import { createOrchestrator, checkApiKey, RateLimitError } from './services/geminiService';
+import MobileNav from './components/MobileNav';
 
 const DEFAULT_PERSONAS: Persona[] = [
   { id: '1', name: 'Alice', role: 'Marketing Director - Focused on strategy and ROI.' },
@@ -34,6 +35,7 @@ const App: React.FC = () => {
   const [isMeetingRunning, setIsMeetingRunning] = useState(false);
   const [isWaitingForAI, setIsWaitingForAI] = useState(false);
   const [error, setError] = useState<string|null>(null);
+  const [mobileView, setMobileView] = useState<'settings' | 'meeting'>('settings');
 
   const abortControllerRef = useRef<AbortController | null>(null);
   const orchestratorRef = useRef<Orchestrator | null>(null);
@@ -43,6 +45,58 @@ const App: React.FC = () => {
       currentSpeakerIndex: -1,
       userIntervention: null as string | null,
   });
+
+
+  // Effect to load metadata and update SEO tags
+  useEffect(() => {
+    const updateMetaTags = (meta: any) => {
+        // Helper to create or update a meta tag
+        const setMetaTag = (attr: 'name' | 'property', key: string, value: string) => {
+            if (!value) return;
+            let element = document.querySelector(`meta[${attr}="${key}"]`) as HTMLMetaElement;
+            if (!element) {
+                element = document.createElement('meta');
+                element.setAttribute(attr, key);
+                document.head.appendChild(element);
+            }
+            element.setAttribute('content', value);
+        };
+
+        if (meta.pageTitle) {
+            document.title = meta.pageTitle;
+        }
+
+        if (meta.metaDescription) {
+            setMetaTag('name', 'description', meta.metaDescription);
+        }
+
+        if (meta.openGraph) {
+            const ogTitle = meta.openGraph.title || meta.pageTitle;
+            const ogDesc = meta.openGraph.description || meta.metaDescription;
+            setMetaTag('property', 'og:title', ogTitle);
+            setMetaTag('property', 'og:description', ogDesc);
+            if (meta.openGraph.image) {
+                setMetaTag('property', 'og:image', meta.openGraph.image);
+            }
+        }
+    };
+
+    const fetchMetadata = async () => {
+        try {
+            const response = await fetch('/metadata.json');
+            if(response.ok) {
+                const meta = await response.json();
+                updateMetaTags(meta);
+            } else {
+                 console.error("Failed to fetch metadata.json:", response.statusText);
+            }
+        } catch (error) {
+            console.error("Failed to load or apply metadata:", error);
+        }
+    };
+
+    fetchMetadata();
+  }, []);
 
 
   // Load initial data from localStorage
@@ -226,6 +280,7 @@ const App: React.FC = () => {
     meetingStateRef.current = { agenda: [], currentAgendaIndex: 0, currentSpeakerIndex: -1, userIntervention: null };
     setChatHistory([createOrchestratorMessage("The meeting will now begin. The AI Orchestrator is generating an agenda...")]);
     setIsMeetingRunning(true);
+    if(window.innerWidth < 768) setMobileView('meeting'); // Switch to meeting view on mobile when starting
   };
 
   const handleStopMeeting = () => {
@@ -294,32 +349,48 @@ const App: React.FC = () => {
 
 
   return (
-    <div className="flex h-screen w-screen font-sans antialiased">
-      <SettingsPanel
-        username={username}
-        onUsernameChange={handleUsernameChange}
-        personas={personas}
-        onAddPersona={handleAddPersonaClick}
-        onEditPersona={handleEditPersonaClick}
-        onDeletePersona={handleDeletePersona}
-        meetingTopic={meetingTopic}
-        onMeetingTopicChange={setMeetingTopic}
-        apiKeys={apiKeys}
-        onAddApiKey={handleAddApiKey}
-        onDeleteApiKey={handleDeleteApiKey}
-        onCheckApiKey={handleCheckApiKey}
-        onStartMeeting={handleStartMeeting}
-        onStopMeeting={handleStopMeeting}
-        onResetMeeting={handleResetMeeting}
+    <div className="h-screen w-screen bg-slate-900 font-sans antialiased">
+      <div className="relative flex h-full w-full flex-col md:flex-row pb-16 md:pb-0">
+        {/* Settings Panel: visible on desktop, or on mobile if mobileView is 'settings' */}
+        <div className={`h-full w-full flex-col md:w-96 lg:w-[420px] md:flex-shrink-0 md:border-r md:border-slate-700/60 ${mobileView === 'settings' ? 'flex' : 'hidden md:flex'}`}>
+          <SettingsPanel
+            username={username}
+            onUsernameChange={handleUsernameChange}
+            personas={personas}
+            onAddPersona={handleAddPersonaClick}
+            onEditPersona={handleEditPersonaClick}
+            onDeletePersona={handleDeletePersona}
+            meetingTopic={meetingTopic}
+            onMeetingTopicChange={setMeetingTopic}
+            apiKeys={apiKeys}
+            onAddApiKey={handleAddApiKey}
+            onDeleteApiKey={handleDeleteApiKey}
+            onCheckApiKey={handleCheckApiKey}
+            onStartMeeting={handleStartMeeting}
+            onStopMeeting={handleStopMeeting}
+            onResetMeeting={handleResetMeeting}
+            isMeetingRunning={isMeetingRunning}
+            error={error}
+          />
+        </div>
+        
+        {/* Meeting Room: visible on desktop, or on mobile if mobileView is 'meeting' */}
+        <div className={`h-full w-full flex-1 flex-col ${mobileView === 'meeting' ? 'flex' : 'hidden md:flex'}`}>
+          <MeetingRoom
+            chatHistory={chatHistory}
+            isMeetingRunning={isMeetingRunning}
+            isWaitingForAI={isWaitingForAI}
+            onSendMessage={handleSendMessage}
+          />
+        </div>
+      </div>
+      
+      <MobileNav 
+        activeView={mobileView} 
+        onViewChange={setMobileView}
         isMeetingRunning={isMeetingRunning}
-        error={error}
       />
-      <MeetingRoom
-        chatHistory={chatHistory}
-        isMeetingRunning={isMeetingRunning}
-        isWaitingForAI={isWaitingForAI}
-        onSendMessage={handleSendMessage}
-      />
+
       <PersonaForm
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}

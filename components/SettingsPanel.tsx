@@ -124,40 +124,42 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
   }
 
   return (
-    <aside className="w-full md:w-1/3 lg:w-1/4 bg-slate-800 p-6 flex flex-col h-full overflow-y-auto">
-      <div className="flex items-center gap-3 pb-6 mb-6 border-b border-slate-700">
-        <UserCircleIcon className="w-12 h-12 text-slate-500 flex-shrink-0" />
-        <div>
-          {isEditingUsername ? (
-            <form onSubmit={handleUsernameSave} className="flex items-center gap-2">
-              <input
-                type="text"
-                value={newUsername}
-                onChange={(e) => setNewUsername(e.target.value)}
-                className="bg-slate-700 border border-slate-600 rounded-md py-1 px-2 text-white w-36 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                autoFocus
-                onBlur={() => setIsEditingUsername(false)}
-              />
-              <button type="submit" className="p-1.5 rounded-md bg-blue-600 text-white hover:bg-blue-500 transition-colors" aria-label="Save username">
-                <CheckCircleIcon className="w-4 h-4"/>
-              </button>
-            </form>
-          ) : (
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl font-bold text-white">{username}</h1>
-              <button onClick={() => setIsEditingUsername(true)} className="text-slate-400 hover:text-white transition-colors" aria-label="Edit username">
-                <PencilIcon className="w-4 h-4" />
-              </button>
-            </div>
-          )}
-          <p className="text-xs text-slate-400 mt-1">Your settings & API keys are saved locally.</p>
+    <aside className="w-full bg-slate-800 p-4 md:p-6 flex flex-col h-full">
+      <div className="flex-shrink-0">
+        <div className="flex items-center gap-3 pb-6 mb-6 border-b border-slate-700">
+          <UserCircleIcon className="w-12 h-12 text-slate-500 flex-shrink-0" />
+          <div>
+            {isEditingUsername ? (
+              <form onSubmit={handleUsernameSave} className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={newUsername}
+                  onChange={(e) => setNewUsername(e.target.value)}
+                  className="bg-slate-700 border border-slate-600 rounded-md py-1 px-2 text-white w-36 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  autoFocus
+                  onBlur={() => setIsEditingUsername(false)}
+                />
+                <button type="submit" className="p-1.5 rounded-md bg-blue-600 text-white hover:bg-blue-500 transition-colors" aria-label="Save username">
+                  <CheckCircleIcon className="w-4 h-4"/>
+                </button>
+              </form>
+            ) : (
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl font-bold text-white">{username}</h1>
+                <button onClick={() => setIsEditingUsername(true)} className="text-slate-400 hover:text-white transition-colors" aria-label="Edit username">
+                  <PencilIcon className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+            <p className="text-xs text-slate-400 mt-1">Your settings & API keys are saved locally.</p>
+          </div>
         </div>
+        
+        <h2 className="text-2xl font-bold text-white mb-2">Meeting Setup</h2>
+        <p className="text-sm text-slate-400 mb-6">Define your AI team and meeting agenda.</p>
       </div>
       
-      <h2 className="text-2xl font-bold text-white mb-2">Meeting Setup</h2>
-      <p className="text-sm text-slate-400 mb-6">Define your AI team and meeting agenda.</p>
-
-      <div className="flex-grow flex flex-col gap-6">
+      <div className="flex-grow flex flex-col gap-6 overflow-y-auto -mr-2 pr-2">
         {/* Personas Section */}
         <div>
           <div className="flex justify-between items-center mb-3">
@@ -171,7 +173,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
               <UserPlusIcon className="w-5 h-5" />
             </button>
           </div>
-          <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
+          <div className="space-y-3">
             {personas.length === 0 && (
               <div className="text-center py-4 px-2 bg-slate-700/80 rounded-md text-slate-400">
                 <p>No personas added yet.</p>
@@ -196,7 +198,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         {/* API Keys Section */}
         <div>
            <h2 className="text-lg font-semibold text-slate-200 mb-3">API Keys ({apiKeys.length})</h2>
-           <div className="space-y-2 mb-3 max-h-40 overflow-y-auto pr-2">
+           <div className="space-y-2 mb-3">
              {apiKeys.length === 0 && (
                 <div className="text-center py-4 px-2 bg-slate-700/80 rounded-md text-slate-400">
                   <p>No API keys added.</p>
@@ -231,37 +233,39 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         </div>
       </div>
       
-      {error && <div className="mt-4 p-3 bg-red-900/50 border border-red-700 text-red-300 text-sm rounded-md">{error}</div>}
+      <div className="flex-shrink-0">
+        {error && <div className="mt-4 p-3 bg-red-900/50 border border-red-700 text-red-300 text-sm rounded-md">{error}</div>}
 
-      <div className="mt-6 pt-6 border-t border-slate-700">
-        <div className="flex items-center gap-2">
-            {isMeetingRunning ? (
-                 <button
-                    onClick={onStopMeeting}
-                    className="w-full flex items-center justify-center gap-2 bg-red-600 text-white font-bold py-3 px-4 rounded-md hover:bg-red-500 transition-colors"
-                >
-                    <StopIcon className="w-5 h-5"/>
-                    Stop Meeting
-                </button>
-            ) : (
-                <button
-                    onClick={onStartMeeting}
-                    disabled={!canStartMeeting}
-                    className="w-full flex items-center justify-center gap-2 bg-green-600 text-white font-bold py-3 px-4 rounded-md hover:bg-green-500 transition-colors disabled:bg-slate-600 disabled:cursor-not-allowed"
-                    aria-label={!canStartMeeting ? 'Please add personas, a topic, and at least one active API key to start.' : 'Start Meeting'}
-                >
-                    <PlayIcon className="w-5 h-5"/>
-                    Start Meeting
-                </button>
-            )}
-            <button 
-                onClick={onResetMeeting} 
-                disabled={isMeetingRunning}
-                className="p-3 bg-slate-600 text-white rounded-md hover:bg-slate-500 transition-colors disabled:bg-slate-700 disabled:cursor-not-allowed" 
-                aria-label="Reset Meeting"
-            >
-                <ArrowPathIcon className="w-5 h-5"/>
-            </button>
+        <div className="mt-6 pt-6 border-t border-slate-700">
+          <div className="flex items-center gap-2">
+              {isMeetingRunning ? (
+                   <button
+                      onClick={onStopMeeting}
+                      className="w-full flex items-center justify-center gap-2 bg-red-600 text-white font-bold py-3 px-4 rounded-md hover:bg-red-500 transition-colors"
+                  >
+                      <StopIcon className="w-5 h-5"/>
+                      Stop Meeting
+                  </button>
+              ) : (
+                  <button
+                      onClick={onStartMeeting}
+                      disabled={!canStartMeeting}
+                      className="w-full flex items-center justify-center gap-2 bg-green-600 text-white font-bold py-3 px-4 rounded-md hover:bg-green-500 transition-colors disabled:bg-slate-600 disabled:cursor-not-allowed"
+                      aria-label={!canStartMeeting ? 'Please add personas, a topic, and at least one active API key to start.' : 'Start Meeting'}
+                  >
+                      <PlayIcon className="w-5 h-5"/>
+                      Start Meeting
+                  </button>
+              )}
+              <button 
+                  onClick={onResetMeeting} 
+                  disabled={isMeetingRunning}
+                  className="p-3 bg-slate-600 text-white rounded-md hover:bg-slate-500 transition-colors disabled:bg-slate-700 disabled:cursor-not-allowed" 
+                  aria-label="Reset Meeting"
+              >
+                  <ArrowPathIcon className="w-5 h-5"/>
+              </button>
+          </div>
         </div>
       </div>
     </aside>

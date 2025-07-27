@@ -1,6 +1,13 @@
 {
-  "name": "AI Marketing Meeting Room",
-  "description": "An application to simulate a marketing meeting with AI-powered personas. Users can define AI characters, set a meeting topic, and watch as the AI team discusses the subject. API keys are managed via environment variables for security.",
+  "appName": "AI Marketing Meeting Room",
+  "appDescription": "An application to simulate a marketing meeting with AI-powered personas. Users can define AI characters, set a meeting topic, and watch as the AI team discusses the subject.",
+  "pageTitle": "AI Marketing Meeting Room | Simulate AI Team Discussions",
+  "metaDescription": "Use AI personas to simulate a marketing meeting. Define characters, set a topic, and get insights from an AI-powered discussion.",
+  "openGraph": {
+    "title": "AI Marketing Meeting Room",
+    "description": "Simulate strategic marketing meetings with an AI team and see what they come up with.",
+    "image": ""
+  },
   "requestFramePermissions": [],
   "prompt": ""
 }
